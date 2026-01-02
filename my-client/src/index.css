@@ -1,1 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
 @import "tailwindcss";
+
+/* 1. Blueprint Theme Variables */
+.bg-blueprint {
+    background-color: #0c1219; /* Darker, more premium engineering blue */
+    background-image:
+            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+}
+
+/* 2. Custom Scrollbar (Hides default browser bars) */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+
+/* 3. Utility Overrides */
+.font-mono {
+    font-family: 'JetBrains Mono', monospace !important;
+}
+.font-sans {
+    font-family: 'Inter', sans-serif !important;
+}
+
+.cursor-crosshair-all, .cursor-crosshair-all * {
+    cursor: crosshair !important;
+}
