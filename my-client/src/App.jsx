@@ -5,6 +5,7 @@ import SystemFooter from "./components/SystemFooter";
 import Home from "./pages/Home";
 import Projects from "./pages/Projects";
 import About from "./pages/About";
+import Contact from "./pages/Contact";
 
 function App() {
     const [isBrutalist, setIsBrutalist] = useState(true);
@@ -38,6 +39,7 @@ function App() {
                         <Route path="/" element={<Home isBrutalist={isBrutalist} />} />
                         <Route path="/projects" element={<Projects isBrutalist={isBrutalist} />} />
                         <Route path="/about" element={<About isBrutalist={isBrutalist} />} />
+                        <Route path="/contact" element={<Contact isBrutalist={isBrutalist} />} />
                     </Routes>
                 </div>
 
