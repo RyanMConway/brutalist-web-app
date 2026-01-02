@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+
+# Environment Variables (Secrets)
+.env
+
+# IntelliJ Files
+.idea/
+*.iml
+
+# Build output
+dist/
