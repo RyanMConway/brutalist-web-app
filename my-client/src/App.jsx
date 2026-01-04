@@ -43,6 +43,23 @@ function LayoutContent() {
 
     const toggleTheme = () => setIsBrutalist(!isBrutalist);
 
+    // --- NEW: DYNAMIC FAVICON & TITLE LOGIC ---
+    useEffect(() => {
+        // 1. Update the Tab Title
+        document.title = isBrutalist
+            ? ">> SYSTEM_ONLINE // RYAN_CONWAY"
+            : "Ryan Conway | Senior Software Engineer";
+
+        // 2. Update the Favicon
+        const link = document.querySelector("link[rel~='icon']");
+        if (link) {
+            link.href = isBrutalist
+                ? "/favicon-brutalist.svg"
+                : "/favicon-sleek.svg";
+        }
+    }, [isBrutalist]);
+    // -------------------------------------------
+
     useEffect(() => {
         if (scrollRef.current) scrollRef.current.scrollTo(0, 0);
     }, [location.pathname]);
@@ -54,12 +71,10 @@ function LayoutContent() {
     return (
         <div key={isBrutalist ? location.pathname : 'static'} className={bgClass}>
 
-            {/* --- NEW: AURORA BACKGROUNDS (Sleek Mode Only) --- */}
+            {/* --- SLEEK MODE AURORA BACKGROUNDS --- */}
             {!isBrutalist && (
                 <>
-                    {/* Top Right Blob (Blue) */}
                     <div className="fixed top-[-20%] right-[-10%] w-[50vw] h-[50vw] bg-blue-400/20 rounded-full blur-[120px] pointer-events-none mix-blend-multiply z-0" />
-                    {/* Bottom Left Blob (Purple) */}
                     <div className="fixed bottom-[-20%] left-[-10%] w-[50vw] h-[50vw] bg-purple-400/20 rounded-full blur-[120px] pointer-events-none mix-blend-multiply z-0" />
                 </>
             )}
@@ -69,7 +84,7 @@ function LayoutContent() {
 
             <Navbar isBrutalist={isBrutalist} toggleTheme={toggleTheme} />
 
-            {/* Content Container (z-10 ensures it sits ABOVE the aurora blobs) */}
+            {/* Content Container */}
             <div ref={scrollRef} className={`flex-1 overflow-y-auto overflow-x-hidden relative z-10 ${isBrutalist ? "pt-24 px-6" : "pt-32 px-6"}`}>
 
                 {isBrutalist && (
