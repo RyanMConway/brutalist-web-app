@@ -7,10 +7,8 @@ import Navbar from "./components/Navbar";
 import SystemFooter from "./components/SystemFooter";
 import ChatWidget from "./components/ChatWidget";
 import PageTransition from "./components/PageTransition";
-import MatrixRain from "./components/MatrixRain"; // NEW IMPORT
-
-// Hooks
-import { useKonamiCode } from "./hooks/useKonamiCode"; // NEW IMPORT
+import MatrixRain from "./components/MatrixRain";
+import { useKonamiCode } from "./hooks/useKonamiCode";
 
 // Pages
 import Home from "./pages/Home";
@@ -40,43 +38,39 @@ function AnimatedRoutes({ isBrutalist }) {
 function LayoutContent() {
     const [isBrutalist, setIsBrutalist] = useState(true);
     const location = useLocation();
-
-    // Ref to control the scroll container
     const scrollRef = useRef(null);
-
-    // NEW: Listen for the Konami Code (Returns true when typed)
     const godMode = useKonamiCode();
 
     const toggleTheme = () => setIsBrutalist(!isBrutalist);
 
-    // Reset scroll to top whenever the route changes
     useEffect(() => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollTo(0, 0);
-        }
+        if (scrollRef.current) scrollRef.current.scrollTo(0, 0);
     }, [location.pathname]);
 
     const bgClass = isBrutalist
-        // BRUTALIST
         ? "bg-blueprint cursor-crosshair-all text-white font-mono h-[100dvh] w-screen overflow-hidden fixed inset-0 crt-turn-on flex flex-col"
-        // SLEEK
         : "bg-slate-50 text-slate-900 font-sans h-[100dvh] w-screen overflow-hidden fixed inset-0 transition-colors duration-500 flex flex-col";
 
     return (
         <div key={isBrutalist ? location.pathname : 'static'} className={bgClass}>
 
-            {/* 1. MATRIX RAIN LAYER (Only shows if Konami Code is typed) */}
-            {godMode && <MatrixRain />}
+            {/* --- NEW: AURORA BACKGROUNDS (Sleek Mode Only) --- */}
+            {!isBrutalist && (
+                <>
+                    {/* Top Right Blob (Blue) */}
+                    <div className="fixed top-[-20%] right-[-10%] w-[50vw] h-[50vw] bg-blue-400/20 rounded-full blur-[120px] pointer-events-none mix-blend-multiply z-0" />
+                    {/* Bottom Left Blob (Purple) */}
+                    <div className="fixed bottom-[-20%] left-[-10%] w-[50vw] h-[50vw] bg-purple-400/20 rounded-full blur-[120px] pointer-events-none mix-blend-multiply z-0" />
+                </>
+            )}
 
+            {godMode && <MatrixRain />}
             {isBrutalist && <div className="scanlines"></div>}
 
             <Navbar isBrutalist={isBrutalist} toggleTheme={toggleTheme} />
 
-            {/* SCROLLABLE AREA */}
-            <div
-                ref={scrollRef}
-                className={`flex-1 overflow-y-auto overflow-x-hidden ${isBrutalist ? "pt-24 px-6" : "pt-32 px-6"}`}
-            >
+            {/* Content Container (z-10 ensures it sits ABOVE the aurora blobs) */}
+            <div ref={scrollRef} className={`flex-1 overflow-y-auto overflow-x-hidden relative z-10 ${isBrutalist ? "pt-24 px-6" : "pt-32 px-6"}`}>
 
                 {isBrutalist && (
                     <>
@@ -85,27 +79,18 @@ function LayoutContent() {
                     </>
                 )}
 
-                {/* Main Page Content */}
                 <AnimatedRoutes isBrutalist={isBrutalist} />
-
-                {/* Bottom Spacer */}
                 <div className="h-12"></div>
             </div>
 
-            {/* FOOTER AREA */}
             <SystemFooter isBrutalist={isBrutalist} />
-
             <ChatWidget isBrutalist={isBrutalist} />
         </div>
     );
 }
 
 function App() {
-    return (
-        <Router>
-            <LayoutContent />
-        </Router>
-    );
+    return <Router><LayoutContent /></Router>;
 }
 
 export default App;
