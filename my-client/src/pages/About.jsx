@@ -1,5 +1,6 @@
 import PhysiqueChart from "../components/PhysiqueChart";
-import GravitySkills from "../components/GravitySkills"; // NEW IMPORT
+import GravitySkills from "../components/GravitySkills";
+import HoloCard from "../components/HoloCard"; // NEW IMPORT
 
 export default function About({ isBrutalist }) {
     return (
@@ -12,7 +13,7 @@ export default function About({ isBrutalist }) {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
 
-                {/* LEFT COLUMN: TEXT BIO */}
+                {/* --- LEFT COLUMN: TEXT BIO & GRAVITY --- */}
                 <div className="space-y-8">
 
                     {/* Bio Section */}
@@ -44,23 +45,41 @@ export default function About({ isBrutalist }) {
                         </p>
                     </div>
 
-                    {/* NEW: Gravity Skills Area */}
+                    {/* Gravity Skills Area */}
                     <div className="mt-8">
                         <GravitySkills isBrutalist={isBrutalist} />
                     </div>
 
                 </div>
 
-                {/* RIGHT COLUMN: CHART */}
-                <div className="flex flex-col gap-6">
-                    <PhysiqueChart isBrutalist={isBrutalist} />
+                {/* --- RIGHT COLUMN: VISUALS --- */}
+                <div className="flex flex-col gap-12">
 
-                    {/* Caption for the chart */}
-                    <div className={`p-4 text-sm ${isBrutalist ? "text-emerald-500/60 font-mono" : "text-slate-500 italic text-center"}`}>
-                        {isBrutalist
-                            ? ">> FIG 2.1: DATA_CORRELATION // CALORIC_DEFICIT vs MASS_REDUCTION"
-                            : "Visualizing the relationship between caloric intake and competition weight prep."}
+                    {/* 1. Physique Chart */}
+                    <div>
+                        <div className="h-[400px] w-full min-h-[400px]">
+                            <PhysiqueChart isBrutalist={isBrutalist} />
+                        </div>
+                        <div className={`p-4 text-sm ${isBrutalist ? "text-emerald-500/60 font-mono" : "text-slate-500 italic text-center"}`}>
+                            {isBrutalist
+                                ? ">> FIG 2.1: DATA_CORRELATION // CALORIC_DEFICIT vs MASS_REDUCTION"
+                                : "Visualizing the relationship between caloric intake and competition weight prep."}
+                        </div>
                     </div>
+
+                    {/* 2. NEW: The Strategist (Holo Card) */}
+                    <div className={isBrutalist ? "border border-emerald-500/30 bg-black/40 p-8 rounded-xl" : "bg-white p-8 rounded-2xl shadow-lg"}>
+                        <h3 className={`text-center mb-6 text-xl font-bold ${isBrutalist ? "text-white font-mono" : "text-slate-800"}`}>
+                            {isBrutalist ? ">> MODULE: STRATEGIST" : "The Strategist"}
+                        </h3>
+
+                        <HoloCard isBrutalist={isBrutalist} />
+
+                        <p className={`mt-6 text-center text-sm ${isBrutalist ? "text-slate-400 font-mono" : "text-slate-600"}`}>
+                            "Competitive Magic: The Gathering teaches resource management and probability assessment under pressure."
+                        </p>
+                    </div>
+
                 </div>
 
             </div>
