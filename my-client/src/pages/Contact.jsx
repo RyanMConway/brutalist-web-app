@@ -1,17 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
-import { Send, Terminal, Loader } from 'lucide-react';
+import { Send, Terminal, Loader, ShieldAlert } from 'lucide-react';
 
 export default function Contact({ isBrutalist }) {
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
     // --- SLEEK MODE STATE ---
     const [formData, setFormData] = useState({ name: '', message: '' });
-    const [status, setStatus] = useState('idle'); // idle, loading, success, error
+    const [status, setStatus] = useState('idle');
 
     // --- BRUTALIST (TERMINAL) MODE STATE ---
     const [logs, setLogs] = useState([
         { type: 'system', text: 'CONNECTION ESTABLISHED.' },
-        { type: 'system', text: 'INITIATING HANDSHAKE PROTOCOL...' },
+        { type: 'system', text: 'RYAN_OS v2.5.0 ONLINE.' },
+        { type: 'info', text: 'TYPE "HELP" FOR COMMAND LIST.' },
         { type: 'system', text: 'PLEASE IDENTIFY YOURSELF (ENTER NAME):' }
     ]);
     const [inputValue, setInputValue] = useState('');
@@ -19,49 +20,74 @@ export default function Contact({ isBrutalist }) {
     const [terminalName, setTerminalName] = useState('');
     const bottomRef = useRef(null);
 
-    // Auto-scroll terminal to bottom
+    // Auto-scroll terminal
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [logs]);
 
-    // --- SLEEK HANDLERS ---
-    const handleSleekSubmit = async (e) => {
-        e.preventDefault();
-        setStatus('loading');
+    // --- EASTER EGG COMMANDS ---
+    const checkCommand = (input) => {
+        const cmd = input.toLowerCase().trim();
 
-        try {
-            const res = await fetch(`${API_URL}/messages`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sender_name: formData.name, message_content: formData.message })
-            });
-            if (res.ok) setStatus('success');
-            else setStatus('error');
-        } catch (err) {
-            setStatus('error');
-        }
+        const commands = {
+            'help': "AVAILABLE COMMANDS: HELP, CLEAR, WHOAMI, STACK, FLEX, STATS, GARAGE, ROLL, MTG",
+            'sudo': "ACCESS DENIED. NICE TRY.",
+            'clear': "CLEARING...",
+            'whoami': "USER: GUEST | PERMISSIONS: READ_ONLY",
+            'ls': "resume.pdf  gym_routine.md  world_domination_plans.txt  aws_credentials.pem",
+
+            // Tech
+            'stack': "CORE: React, Node.js, Postgres | DATA: PySpark, AWS EMR, Glue | INFRA: EC2, EKS, Terraform",
+
+            // Bodybuilding
+            'flex': "💪 ( ^_^ )/ --[ GAINS DETECTED ]",
+            'stats': "HEIGHT: 6'0\" | OFF-SEASON: 260lbs | STAGE: 209lbs | BF%: VARIABLE",
+            'macros': "PROTEIN: 250g | CARBS: 300g | FATS: 60g | SLEEP: 8HRS",
+
+            // Vehicles
+            'garage': "LOADOUT: Subaru WRX (Daily) | Motorcycle [Classified] | STATUS: Garage Capacity Critical",
+
+            // Nerd Culture
+            'roll': `D20 ROLL: ${Math.floor(Math.random() * 20) + 1}`,
+            'mtg': "TAP: 💧💧 Add UU to mana pool. COUNTERSPELL READY.",
+            'cat world_domination_plans.txt': "1. Lift heavy circles.\n2. Write clean ETL pipelines.\n3. Buy more Magic cards.",
+            'cat aws_credentials.pem': "⚠️ SECURITY ALERT: INCIDENT REPORTED TO TIAA INFOSEC."
+        };
+
+        return commands[cmd] || null;
     };
 
-    // --- BRUTALIST HANDLERS ---
+    // --- BRUTALIST HANDLER ---
     const handleTerminalSubmit = async (e) => {
         if (e.key !== 'Enter') return;
 
         const userInput = inputValue.trim();
         if (!userInput) return;
 
-        // Add user input to logs
+        // 1. Add User Input to Logs
         const newLogs = [...logs, { type: 'user', text: `> ${userInput}` }];
         setInputValue('');
 
+        // 2. Check for Commands (Intercept)
+        const commandResponse = checkCommand(userInput);
+
+        if (commandResponse) {
+            if (userInput.toLowerCase() === 'clear') {
+                setLogs([{ type: 'system', text: 'CONSOLE CLEARED.' }]);
+            } else {
+                setLogs([...newLogs, { type: 'success', text: `>> ${commandResponse}` }]);
+            }
+            return; // STOP HERE (Don't process as name/message)
+        }
+
+        // 3. Normal Contact Flow
         if (step === 0) {
-            // User entered Name
             setTerminalName(userInput);
             setLogs([...newLogs, { type: 'system', text: `ACKNOWLEDGED, ${userInput}. ENTER TRANSMISSION CONTENT:` }]);
             setStep(1);
         } else if (step === 1) {
-            // User entered Message -> SEND TO API
             setLogs([...newLogs, { type: 'system', text: 'ENCRYPTING AND TRANSMITTING...' }]);
-            setStep(2); // Lock input
+            setStep(2);
 
             try {
                 const res = await fetch(`${API_URL}/messages`, {
@@ -80,8 +106,25 @@ export default function Contact({ isBrutalist }) {
                 }
             } catch (err) {
                 setLogs(prev => [...prev, { type: 'error', text: '>> ERROR: CONNECTION SEVERED. TRY AGAIN.' }]);
-                setStep(0); // Reset
+                setStep(0);
             }
+        }
+    };
+
+    // --- SLEEK HANDLER ---
+    const handleSleekSubmit = async (e) => {
+        e.preventDefault();
+        setStatus('loading');
+        try {
+            const res = await fetch(`${API_URL}/messages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sender_name: formData.name, message_content: formData.message })
+            });
+            if (res.ok) setStatus('success');
+            else setStatus('error');
+        } catch (err) {
+            setStatus('error');
         }
     };
 
@@ -96,15 +139,16 @@ export default function Contact({ isBrutalist }) {
             </header>
 
             {isBrutalist ? (
-                // ================= BRUTALIST TERMINAL =================
-                <div className="w-full bg-black border-2 border-emerald-500 p-6 font-mono text-sm md:text-base shadow-[0_0_20px_rgba(16,185,129,0.2)] min-h-[400px] flex flex-col">
-                    <div className="flex-1 space-y-2 mb-4 overflow-y-auto max-h-[500px]">
+                // TERMINAL MODE
+                <div className="w-full bg-black border-2 border-emerald-500 p-6 font-mono text-sm md:text-base shadow-[0_0_20px_rgba(16,185,129,0.2)] min-h-[500px] flex flex-col">
+                    <div className="flex-1 space-y-2 mb-4 overflow-y-auto max-h-[500px] scrollbar-hide">
                         {logs.map((log, i) => (
                             <div key={i} className={
                                 log.type === 'user' ? "text-white" :
                                     log.type === 'error' ? "text-red-500 font-bold" :
                                         log.type === 'success' ? "text-emerald-400 font-bold" :
-                                            "text-emerald-600" // System text color
+                                            log.type === 'info' ? "text-blue-400" :
+                                                "text-emerald-600"
                             }>
                                 {log.text}
                             </div>
@@ -113,7 +157,7 @@ export default function Contact({ isBrutalist }) {
                     </div>
 
                     {step < 2 && (
-                        <div className="flex items-center gap-2 text-emerald-500">
+                        <div className="flex items-center gap-2 text-emerald-500 bg-emerald-900/10 p-2 rounded">
                             <span className="animate-pulse">_</span>
                             <input
                                 autoFocus
@@ -122,13 +166,18 @@ export default function Contact({ isBrutalist }) {
                                 onChange={(e) => setInputValue(e.target.value)}
                                 onKeyDown={handleTerminalSubmit}
                                 className="bg-transparent border-none outline-none text-white w-full font-mono uppercase"
-                                placeholder={step === 0 ? "ENTER_NAME" : "ENTER_MESSAGE"}
+                                placeholder={step === 0 ? "ENTER_NAME (OR COMMAND)" : "ENTER_MESSAGE"}
                             />
                         </div>
                     )}
+                    {step === 2 && (
+                        <button onClick={() => { setStep(0); setLogs([]); }} className="mt-4 text-emerald-500 hover:text-white border border-emerald-500 px-4 py-2 w-fit">
+                            RESET_CONNECTION
+                        </button>
+                    )}
                 </div>
             ) : (
-                // ================= SLEEK FORM =================
+                // SLEEK FORM (Unchanged)
                 <div className="bg-slate-900/50 p-10 rounded-3xl border border-white/10 backdrop-blur-xl shadow-2xl">
                     {status === 'success' ? (
                         <div className="text-center py-20">

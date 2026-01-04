@@ -3,33 +3,75 @@
 
 /* 1. Blueprint Theme Variables */
 .bg-blueprint {
-    background-color: #0c1219; /* Darker, more premium engineering blue */
+    background-color: #0c1219;
     background-image:
             linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
             linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
     background-size: 50px 50px;
+
+    /* Ensure the background covers the screen during the animation */
+    transform-origin: center;
+    min-height: 100vh;
+    width: 100%;
+    position: absolute; /* Fixes position during scaling */
 }
 
-/* 2. Custom Scrollbar (Hides default browser bars) */
-::-webkit-scrollbar {
-    width: 8px;
-}
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-::-webkit-scrollbar-thumb {
-    background: #334155;
-    border-radius: 4px;
+/* 2. Custom Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+/* 3. Utilities */
+.font-mono { font-family: 'JetBrains Mono', monospace !important; }
+.font-sans { font-family: 'Inter', sans-serif !important; }
+.cursor-crosshair-all, .cursor-crosshair-all * { cursor: crosshair !important; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* 4. CRT SCANLINES */
+.scanlines {
+    background: linear-gradient(
+            to bottom,
+            rgba(255,255,255,0),
+            rgba(255,255,255,0) 50%,
+            rgba(0,0,0,0.5) 50%,
+            rgba(0,0,0,0.5)
+    );
+    background-size: 100% 4px;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 9999; /* Force on top */
+    opacity: 0.6;
 }
 
-/* 3. Utility Overrides */
-.font-mono {
-    font-family: 'JetBrains Mono', monospace !important;
-}
-.font-sans {
-    font-family: 'Inter', sans-serif !important;
+/* 5. THE "OLD SCHOOL" TURN ON ANIMATION */
+@keyframes turnOn {
+    0% {
+        transform: scale(0, 0);
+        opacity: 0;
+        filter: brightness(0);
+    }
+    10% {
+        transform: scale(0.001, 0.004); /* The Dot */
+        opacity: 1;
+        filter: brightness(30); /* Blinding White */
+    }
+    40% {
+        transform: scale(1, 0.004); /* The Horizontal Line */
+        filter: brightness(20);
+    }
+    60% {
+        transform: scale(1, 0.004); /* PAUSE: Hold the line */
+        filter: brightness(10);
+    }
+    100% {
+        transform: scale(1, 1); /* The Vertical Snap */
+        filter: brightness(1);
+    }
 }
 
-.cursor-crosshair-all, .cursor-crosshair-all * {
-    cursor: crosshair !important;
+.crt-turn-on {
+    /* Slightly slower (0.5s) to let the eye see the "Line" phase */
+    animation: turnOn 0.5s cubic-bezier(0.1, 0, 0.2, 1) forwards;
 }

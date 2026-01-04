@@ -1,53 +1,102 @@
-import { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
+
+// Components
 import Navbar from "./components/Navbar";
 import SystemFooter from "./components/SystemFooter";
+import ChatWidget from "./components/ChatWidget";
+import PageTransition from "./components/PageTransition";
+
+// Pages
 import Home from "./pages/Home";
 import Projects from "./pages/Projects";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
 
-function App() {
-    const [isBrutalist, setIsBrutalist] = useState(true);
-
-    const toggleTheme = () => {
-        setIsBrutalist(!isBrutalist);
-    };
-
-    // Dynamic Class: Applies the Grid (bg-blueprint) and Cursor (cursor-crosshair-all)
-    const bgClass = isBrutalist
-        ? "bg-blueprint cursor-crosshair-all text-white font-mono min-h-screen relative"
-        : "bg-slate-900 text-slate-200 font-sans min-h-screen relative transition-colors duration-500";
+function AnimatedRoutes({ isBrutalist }) {
+    const location = useLocation();
 
     return (
-        <div className={bgClass}>
-            <Router>
-                <Navbar isBrutalist={isBrutalist} toggleTheme={toggleTheme} />
+        <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
+                <Route path="/" element={<PageTransition><Home isBrutalist={isBrutalist} /></PageTransition>} />
+                <Route path="/projects" element={<PageTransition><Projects isBrutalist={isBrutalist} /></PageTransition>} />
+                <Route path="/about" element={<PageTransition><About isBrutalist={isBrutalist} /></PageTransition>} />
+                <Route path="/contact" element={<PageTransition><Contact isBrutalist={isBrutalist} /></PageTransition>} />
+                <Route path="/admin" element={<PageTransition><AdminLogin isBrutalist={isBrutalist} /></PageTransition>} />
+                <Route path="/admin/dashboard" element={<PageTransition><AdminDashboard isBrutalist={isBrutalist} /></PageTransition>} />
+            </Routes>
+        </AnimatePresence>
+    );
+}
 
-                {/* Layout Container with padding for the footer */}
-                <div className={isBrutalist ? "pt-24 px-6 pb-20" : "pt-32 px-6 pb-20"}>
+function LayoutContent() {
+    const [isBrutalist, setIsBrutalist] = useState(true);
+    const location = useLocation();
 
-                    {/* Brutalist Decor: Faint Vertical Lines */}
-                    {isBrutalist && (
-                        <>
-                            <div className="fixed top-0 left-6 w-px h-full bg-white opacity-10 pointer-events-none"></div>
-                            <div className="fixed top-0 right-6 w-px h-full bg-white opacity-10 pointer-events-none"></div>
-                        </>
-                    )}
+    // Ref to control the scroll container
+    const scrollRef = useRef(null);
 
-                    <Routes>
-                        <Route path="/" element={<Home isBrutalist={isBrutalist} />} />
-                        <Route path="/projects" element={<Projects isBrutalist={isBrutalist} />} />
-                        <Route path="/about" element={<About isBrutalist={isBrutalist} />} />
-                        <Route path="/contact" element={<Contact isBrutalist={isBrutalist} />} />
-                    </Routes>
-                </div>
+    const toggleTheme = () => setIsBrutalist(!isBrutalist);
 
-                {/* The New Footer (Only appears when isBrutalist is true) */}
-                <SystemFooter isBrutalist={isBrutalist} />
+    // Reset scroll to top whenever the route changes
+    useEffect(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollTo(0, 0);
+        }
+    }, [location.pathname]);
 
-            </Router>
+    const bgClass = isBrutalist
+        // BRUTALIST: h-[100dvh] ensures it fits the mobile viewport perfectly
+        ? "bg-blueprint cursor-crosshair-all text-white font-mono h-[100dvh] w-screen overflow-hidden fixed inset-0 crt-turn-on flex flex-col"
+        // SLEEK
+        : "bg-slate-50 text-slate-900 font-sans h-[100dvh] w-screen overflow-hidden fixed inset-0 transition-colors duration-500 flex flex-col";
+
+    return (
+        <div key={isBrutalist ? location.pathname : 'static'} className={bgClass}>
+
+            {isBrutalist && <div className="scanlines"></div>}
+
+            <Navbar isBrutalist={isBrutalist} toggleTheme={toggleTheme} />
+
+            {/* SCROLLABLE AREA (Takes all remaining space) */}
+            <div
+                ref={scrollRef}
+                className={`flex-1 overflow-y-auto overflow-x-hidden ${isBrutalist ? "pt-24 px-6" : "pt-32 px-6"}`}
+            >
+
+                {isBrutalist && (
+                    <>
+                        <div className="fixed top-0 left-6 w-px h-full bg-white opacity-5 pointer-events-none z-0"></div>
+                        <div className="fixed top-0 right-6 w-px h-full bg-white opacity-5 pointer-events-none z-0"></div>
+                    </>
+                )}
+
+                {/* Main Page Content */}
+                <AnimatedRoutes isBrutalist={isBrutalist} />
+
+                {/* NOTE: We removed the footer from here. It is now outside the scroll view. */}
+                {/* We add a little bottom spacer so content doesn't feel cramped against the footer */}
+                <div className="h-12"></div>
+            </div>
+
+            {/* FOOTER AREA (Pinned to bottom of Flex Container) */}
+            {/* This ensures it is always visible but never overlays content */}
+            <SystemFooter isBrutalist={isBrutalist} />
+
+            <ChatWidget isBrutalist={isBrutalist} />
         </div>
+    );
+}
+
+function App() {
+    return (
+        <Router>
+            <LayoutContent />
+        </Router>
     );
 }
 

@@ -24,7 +24,9 @@ export default function SystemFooter({ isBrutalist }) {
     if (!isBrutalist) return null; // Don't show in Sleek mode
 
     return (
-        <div className="fixed bottom-0 left-0 w-full bg-[#002244] border-t border-white text-white font-mono text-xs py-1 px-4 flex justify-between uppercase tracking-widest z-50">
+        // REMOVED 'fixed bottom-0 left-0'
+        // This is now a static block that lives at the bottom of the Flex container
+        <div className="w-full bg-[#002244] border-t border-white text-white font-mono text-xs py-1 px-4 flex justify-between uppercase tracking-widest z-50">
             {/* Left Side: System Status & Coords */}
             <div className="flex gap-4 md:gap-8">
                 <span className="hidden sm:inline">SYS_STATUS: ONLINE</span>
