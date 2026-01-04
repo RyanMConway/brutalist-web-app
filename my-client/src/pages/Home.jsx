@@ -83,7 +83,7 @@ export default function Home({ isBrutalist }) {
                         <Terminal size={16} /> PySpark
                     </div>
                     <div className="flex items-center gap-2">
-                        <Dumbbell size={16} /> 260lbs Off-Season
+                        <Dumbbell size={16} /> Competitive Bodybuilder
                     </div>
                 </div>
             </div>

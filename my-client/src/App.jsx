@@ -7,6 +7,10 @@ import Navbar from "./components/Navbar";
 import SystemFooter from "./components/SystemFooter";
 import ChatWidget from "./components/ChatWidget";
 import PageTransition from "./components/PageTransition";
+import MatrixRain from "./components/MatrixRain"; // NEW IMPORT
+
+// Hooks
+import { useKonamiCode } from "./hooks/useKonamiCode"; // NEW IMPORT
 
 // Pages
 import Home from "./pages/Home";
@@ -40,6 +44,9 @@ function LayoutContent() {
     // Ref to control the scroll container
     const scrollRef = useRef(null);
 
+    // NEW: Listen for the Konami Code (Returns true when typed)
+    const godMode = useKonamiCode();
+
     const toggleTheme = () => setIsBrutalist(!isBrutalist);
 
     // Reset scroll to top whenever the route changes
@@ -50,7 +57,7 @@ function LayoutContent() {
     }, [location.pathname]);
 
     const bgClass = isBrutalist
-        // BRUTALIST: h-[100dvh] ensures it fits the mobile viewport perfectly
+        // BRUTALIST
         ? "bg-blueprint cursor-crosshair-all text-white font-mono h-[100dvh] w-screen overflow-hidden fixed inset-0 crt-turn-on flex flex-col"
         // SLEEK
         : "bg-slate-50 text-slate-900 font-sans h-[100dvh] w-screen overflow-hidden fixed inset-0 transition-colors duration-500 flex flex-col";
@@ -58,11 +65,14 @@ function LayoutContent() {
     return (
         <div key={isBrutalist ? location.pathname : 'static'} className={bgClass}>
 
+            {/* 1. MATRIX RAIN LAYER (Only shows if Konami Code is typed) */}
+            {godMode && <MatrixRain />}
+
             {isBrutalist && <div className="scanlines"></div>}
 
             <Navbar isBrutalist={isBrutalist} toggleTheme={toggleTheme} />
 
-            {/* SCROLLABLE AREA (Takes all remaining space) */}
+            {/* SCROLLABLE AREA */}
             <div
                 ref={scrollRef}
                 className={`flex-1 overflow-y-auto overflow-x-hidden ${isBrutalist ? "pt-24 px-6" : "pt-32 px-6"}`}
@@ -78,13 +88,11 @@ function LayoutContent() {
                 {/* Main Page Content */}
                 <AnimatedRoutes isBrutalist={isBrutalist} />
 
-                {/* NOTE: We removed the footer from here. It is now outside the scroll view. */}
-                {/* We add a little bottom spacer so content doesn't feel cramped against the footer */}
+                {/* Bottom Spacer */}
                 <div className="h-12"></div>
             </div>
 
-            {/* FOOTER AREA (Pinned to bottom of Flex Container) */}
-            {/* This ensures it is always visible but never overlays content */}
+            {/* FOOTER AREA */}
             <SystemFooter isBrutalist={isBrutalist} />
 
             <ChatWidget isBrutalist={isBrutalist} />
